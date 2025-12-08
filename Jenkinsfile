@@ -12,14 +12,6 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/skfareed-dev/spring-boot-hello-world.git'
-            }
-        }
-
         stage('Build Maven Project') {
             steps {
                 sh 'mvn clean package -DskipTests'
