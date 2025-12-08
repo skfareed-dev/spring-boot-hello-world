@@ -1,8 +1,10 @@
 pipeline {
     agent any
-options {
-        skipDefaultCheckout()    // <--- IMPORTANT
+
+    options {
+        skipDefaultCheckout()
     }
+
     environment {
         AWS_REGION = "ap-southeast-1"
         ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
@@ -14,6 +16,13 @@ options {
     }
 
     stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Maven Project') {
             steps {
                 sh 'mvn clean package -DskipTests'
