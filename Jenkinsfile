@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+options {
+        skipDefaultCheckout()    // <--- IMPORTANT
+    }
     environment {
         AWS_REGION = "ap-southeast-1"
         ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
