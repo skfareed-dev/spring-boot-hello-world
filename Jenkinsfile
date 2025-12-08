@@ -19,7 +19,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                deleteDir()          // FIX
+                checkout scm         // FIX
             }
         }
 
