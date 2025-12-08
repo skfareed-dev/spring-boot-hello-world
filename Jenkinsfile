@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         AWS_REGION = "ap-southeast-1"
-        ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
+        ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/SpringBoot-app"
         IMAGE_TAG = "latest"
     }
 
@@ -32,13 +32,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t my-java-app .'
+                sh 'docker build -t SpringBoot-app .'
             }
         }
 
         stage('Tag Image') {
             steps {
-                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
+                sh "docker tag SpringBoot-app:latest ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
