@@ -8,7 +8,7 @@ pipeline {
     }
 
     tools {
-        maven 'Maven3'  // Name of Maven in Jenkins Global Tool Configuration
+        maven 'Maven3'
     }
 
     stages {
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'sudo docker build -t my-java-app .'
+                sh 'docker build -t my-java-app .'
             }
         }
 
