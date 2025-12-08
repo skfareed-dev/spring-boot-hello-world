@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         AWS_REGION = "ap-southeast-1"
-        ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/springboot-app"
+        ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
         IMAGE_TAG = "latest"
     }
 
@@ -32,13 +32,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t springboot-app .'
+                sh 'docker build -t my-java-app .'
             }
         }
 
         stage('Tag Image') {
             steps {
-                sh "docker tag springboot-app:latest ${ECR_REPO}:${IMAGE_TAG}"
+                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
@@ -52,14 +52,7 @@ pipeline {
                 }
             }
         }
-        stage('Create ECR Repository') {
-            steps {
-                sh '''
-                    aws ecr describe-repositories --repository-names ${ECR_REPO##*/} || \
-                    aws ecr create-repository --repository-name ${ECR_REPO##*/}
-                '''
-            }
-        }
+
         stage('Push Image') {
             steps {
                 sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
