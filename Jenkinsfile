@@ -19,8 +19,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                deleteDir()          // FIX
-                checkout scm         // FIX
+                deleteDir()
+                checkout scm
             }
         }
 
@@ -35,29 +35,3 @@ pipeline {
                 sh 'docker build -t my-java-app .'
             }
         }
-
-        stage('Tag Image') {
-            steps {
-                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
-            }
-        }
-
-        stage('ECR Login') {
-    steps {
-        withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
-            sh '''
-                aws ecr get-login-password --region ${AWS_REGION} \
-                | docker login --username AWS --password-stdin ${ECR_REPO}
-            '''
-        }
-    }
-}
-        }
-
-        stage('Push Image') {
-            steps {
-                sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
-            }
-        }
-    }
-}
