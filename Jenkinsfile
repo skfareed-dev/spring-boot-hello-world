@@ -52,7 +52,14 @@ pipeline {
                 }
             }
         }
-
+        stage('Create ECR Repository') {
+            steps {
+                sh '''
+                    aws ecr describe-repositories --repository-names ${ECR_REPO##*/} || \
+                    aws ecr create-repository --repository-name ${ECR_REPO##*/}
+                '''
+            }
+        }
         stage('Push Image') {
             steps {
                 sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
