@@ -7,6 +7,10 @@ pipeline {
         IMAGE_TAG = "latest"
     }
 
+    tools {
+        maven 'Maven3'  // Name of Maven in Jenkins Global Tool Configuration
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -24,34 +28,27 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh '''
-                docker build -t my-java-app .
-                '''
+                sh 'docker build -t my-java-app .'
             }
         }
 
         stage('Tag Image') {
             steps {
-                sh '''
-                docker tag my-java-app:latest $ECR_REPO:$IMAGE_TAG
-                '''
+                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
         stage('ECR Login') {
             steps {
-                sh '''
-                AWS_PAGER="" aws ecr get-login-password --region $AWS_REGION | \
-                docker login --username AWS --password-stdin $ECR_REPO
-                '''
+                withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}'
+                }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh '''
-                docker push $ECR_REPO:$IMAGE_TAG
-                '''
+                sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
     }
