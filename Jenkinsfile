@@ -85,7 +85,7 @@ Status: SUCCESS
 Regards,
 DevOps Team
 """,
-                to: "fsk127699@gmail"
+                to: "fsk127699@gmail.com"
             )
         }
 
@@ -105,7 +105,7 @@ Check console output: ${env.BUILD_URL}console
 Regards,
 DevOps Team
 """,
-                to: "fsk127699@gmail"
+                to: "fsk127699@gmail.com"
             )
         }
     }
