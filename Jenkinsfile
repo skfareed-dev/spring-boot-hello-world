@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     options {
         skipDefaultCheckout()
     }
@@ -67,30 +68,34 @@ pipeline {
                 }
             }
         }
-        post {
-    success {
-        emailext (
-            subject: "SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
+    }
+
+    post {
+        success {
+            emailext (
+                subject: "SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
 Hello Team,
 The Jenkins build has completed successfully.
+
 Job: ${env.JOB_NAME}
 Build Number: ${env.BUILD_NUMBER}
 Status: SUCCESS
 
 Regards,
-devops team
+DevOps Team
 """,
-            to: "your@email.com"
-        )
-    }
+                to: "your@email.com"
+            )
+        }
 
-    failure {
-        emailext (
-            subject: "FAILED: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
+        failure {
+            emailext (
+                subject: "FAILED: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
 Hello Team,
 The Jenkins build has FAILED.
+
 Job: ${env.JOB_NAME}
 Build Number: ${env.BUILD_NUMBER}
 Status: FAILURE
@@ -98,12 +103,10 @@ Status: FAILURE
 Check console output: ${env.BUILD_URL}console
 
 Regards,
-devops team
+DevOps Team
 """,
-            to: "your@email.com"
-        )
-    }
-}
-
+                to: "your@email.com"
+            )
+        }
     }
 }
