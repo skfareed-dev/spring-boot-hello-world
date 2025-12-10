@@ -26,14 +26,15 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Push') {
+        stage('Docker Build') {
             steps {
-                sh '''
-                docker build -t my-java-app .
-                docker tag my-java-app:latest $ECR_REPO:$IMAGE_TAG
-                aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-                docker push $ECR_REPO:$IMAGE_TAG
-                '''
+                sh 'docker build -t my-java-app .'
+            }
+        }
+
+        stage('Tag Image') {
+            steps {
+                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
