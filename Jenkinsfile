@@ -70,7 +70,6 @@ pipeline {
         post {
     success {
         emailext (
-            echo "sending email to devops team"
             subject: "SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
             body: """
 Hello Team,
@@ -88,7 +87,6 @@ devops team
 
     failure {
         emailext (
-             echo "sending email to devops team"
             subject: "FAILED: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
             body: """
 Hello Team,
