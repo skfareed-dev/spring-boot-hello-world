@@ -85,7 +85,7 @@ Status: SUCCESS
 Regards,
 DevOps Team
 """,
-                to: "your@email.com"
+                to: "fsk127699@gmail@email.com"
             )
         }
 
