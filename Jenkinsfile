@@ -105,7 +105,7 @@ Check console output: ${env.BUILD_URL}console
 Regards,
 DevOps Team
 """,
-                to: "your@email.com"
+                to: "fsk127699@gmail"
             )
         }
     }
