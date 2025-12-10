@@ -1,26 +1,18 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout()
-    }
-
     environment {
         AWS_REGION = "ap-southeast-1"
         ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
         IMAGE_TAG = "latest"
-    }
-
-    tools {
-        maven 'Maven3'
+        DEPLOY_SERVER = "10.0.20.156"   // private IP of EC2
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                deleteDir()
-                checkout scm
+                git branch: 'main', url: 'https://github.com/skfareed-dev/spring-boot-hello-world.git'
             }
         }
 
@@ -30,32 +22,30 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Build & Push') {
             steps {
-                sh 'docker build -t my-java-app .'
+                sh '''
+                docker build -t my-java-app .
+                docker tag my-java-app:latest $ECR_REPO:$IMAGE_TAG
+                aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+                docker push $ECR_REPO:$IMAGE_TAG
+                '''
             }
         }
 
-        stage('Tag Image') {
+        stage('Deploy to EC2 via SSH') {
             steps {
-                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
-            }
-        }
-
-        stage('ECR Login') {
-            steps {
-                withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
-                    sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} \
-                        | docker login --username AWS --password-stdin ${ECR_REPO}
-                    '''
+                sshagent(['ec2-ssh']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ec2-user@$DEPLOY_SERVER '
+                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO &&
+                        cd ~/deploy &&
+                        docker-compose pull &&
+                        docker-compose down &&
+                        docker-compose up -d
+                    '
+                    """
                 }
-            }
-        }
-
-        stage('Push Image') {
-            steps {
-                sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
     }
