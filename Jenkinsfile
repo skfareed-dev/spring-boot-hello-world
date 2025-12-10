@@ -3,15 +3,18 @@ pipeline {
     options {
         skipDefaultCheckout()
     }
+
     environment {
         AWS_REGION = "ap-southeast-1"
         ECR_REPO = "369138027325.dkr.ecr.ap-southeast-1.amazonaws.com/my-java-app"
         IMAGE_TAG = "latest"
-        DEPLOY_SERVER = "10.0.20.156"   // private IP of EC2
+        DEPLOY_SERVER = "10.0.20.156"
     }
+
     tools {
         maven 'Maven3'
     }
+
     stages {
 
         stage('Checkout Code') {
@@ -32,31 +35,33 @@ pipeline {
             }
         }
 
-        stage('Tag Image') {
-            steps {
-                sh "docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}"
-            }
-        }
-        stage('ECR Login') {
+        stage('Tag & Push to ECR') {
             steps {
                 withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
                     sh '''
+                        # ECR Login
                         aws ecr get-login-password --region ${AWS_REGION} \
                         | docker login --username AWS --password-stdin ${ECR_REPO}
+
+                        # Tag Image
+                        docker tag my-java-app:latest ${ECR_REPO}:${IMAGE_TAG}
+
+                        # Push Image to ECR
+                        docker push ${ECR_REPO}:${IMAGE_TAG}
                     '''
                 }
             }
         }
+
         stage('Deploy to EC2 via SSH') {
             steps {
                 sshagent(['ec2-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ec2-user@$DEPLOY_SERVER '
-                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO &&
+                    ssh -o StrictHostKeyChecking=no ec2-user@${DEPLOY_SERVER} '
                         cd ~/deploy &&
-                        docker-compose pull &&
-                        docker-compose down &&
-                        docker-compose up -d
+                        docker compose pull &&
+                        docker compose down &&
+                        docker compose up -d
                     '
                     """
                 }
