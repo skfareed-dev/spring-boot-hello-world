@@ -67,5 +67,45 @@ pipeline {
                 }
             }
         }
+        post {
+    success {
+        emailext (
+            echo "sending email to devops team"
+            subject: "SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Hello Team,
+The Jenkins build has completed successfully.
+Job: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+Status: SUCCESS
+
+Regards,
+devops team
+""",
+            to: "your@email.com"
+        )
+    }
+
+    failure {
+        emailext (
+             echo "sending email to devops team"
+            subject: "FAILED: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Hello Team,
+The Jenkins build has FAILED.
+Job: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+Status: FAILURE
+
+Check console output: ${env.BUILD_URL}console
+
+Regards,
+devops team
+""",
+            to: "your@email.com"
+        )
+    }
+}
+
     }
 }
